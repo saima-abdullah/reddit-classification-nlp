@@ -71,8 +71,8 @@ Data collection
 - Code and executive summary must be in a clearly commented Jupyter Notebook.
 - You must submit your slide deck.
 - Deadlines:
-    - **Materials submitted**: 9 AM MT, Friday, May 3rd
-    - **Presentation**: 930 AM MT, Friday, May 3rd
+    - **Materials submitted**: 12 noon ET/ 9 AM PT, Friday, October 11th
+    - **Presentation**: 12:30 PM ET/ 930 AM PT, Friday, October 11th
 
 ---
 
