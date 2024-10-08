@@ -29,28 +29,22 @@ def get_subreddit_posts(headers, subreddit, sort='hot', time_filter='all', limit
     url = f'https://oauth.reddit.com/r/{subreddit}/{sort}?limit={limit}&t={time_filter}'
     if after:
         url += f"&after={after}"  # Add pagination token to the request if available
-    response = requests.get(url, headers=headers)
-    print(f"Status code: {response.status_code}")  # Check the response status code
-    if response.status_code == 200:
-        return response.json()
-    else:
-        print(f"Error: {response.status_code}")
-    return None
-
-# Function to extract relevant post data (title, content, post id, and time)
-def extract_post_data(subreddit_posts):
-    post_data = []
-    if 'data' in subreddit_posts:
-        for post in subreddit_posts['data']['children']:
-            post_info = {
-                'post_id': post['data']['id'],
-                'title': post['data']['title'],
-                'content': post['data']['selftext'],
-                'created_utc': post['data']['created_utc'],
-                'subreddit': post['data']['subreddit']
-            }
-            post_data.append(post_info)
-    return post_data
+    
+    while True:  # Keep trying until the request succeeds or another error occurs
+        response = requests.get(url, headers=headers)
+        print(f"Status code: {response.status_code}")  # Check the response status code
+        
+        if response.status_code == 200:
+            return response.json()
+        
+        elif response.status_code == 429:  # Rate limiting
+            retry_after = int(response.headers.get('Retry-After', 5))  # Retry after time from headers (default 5 seconds)
+            print(f"Rate limit exceeded. Retrying after {retry_after} seconds...")
+            time.sleep(retry_after)
+        
+        else:
+            print(f"Error: {response.status_code}")
+            return None
 
 # Function to get unique posts and handle rate limiting and pagination
 def fetch_reddit_data(client_id, client_secret, username, password, user_agent, subreddit, sorting_methods, time_filters, total_posts_per_subreddit):
@@ -93,6 +87,8 @@ def fetch_reddit_data(client_id, client_secret, username, password, user_agent, 
     # Return DataFrame
     df = pd.DataFrame(all_posts)
     return df
+
+
 
 # Main execution
 if __name__ == '__main__':
