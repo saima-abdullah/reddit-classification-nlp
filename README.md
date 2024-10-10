@@ -1,205 +1,85 @@
-# ![](https://ga-dash.s3.amazonaws.com/production/assets/logo-9f88ae6c9c3871690e33280fcf557f33.png) Project 3: Web APIs & NLP
+# Understanding Consumer Trends: Classifying Reddit Discussions to Guide Product Innovation
+## Problem Statement:
+This project aims to help a global technology company understand how online communities discuss technology innovations and gadgets. By analyzing posts from two key subreddits **technology** and **gadgets**—we will classify discussions into two main categories: 'technology' and 'gadgets'. This classification will enable the company to track emerging trends, guide product development, and tailor marketing strategies more effectively. Product development teams and marketing strategists who will use these insights to align their strategies with current technological trends and consumer demand.\
+The primary objective is to build a machine learning model that automatically classifies Reddit posts into these categories, providing actionable insights to help the company stay ahead in the competitive consumer electronics market. We will evaluate the model’s performance using accuracy, precision, recall, and F1-score to ensure it effectively differentiates and categorizes posts accurately, providing a balanced view of its predictive capabilities across potentially imbalanced classes."
+## Background:
+Reddit is a social media platform and online community where users share, discuss, and vote on content across a wide range of topics within subreddit forums.\
+[r/technology](https://www.reddit.com/r/technology/) iis one of the largest subreddits dedicated to discussions about technology. With millions of members, it serves as a hub for tech enthusiasts, professionals, and casual users to share news, insights, and opinions on the latest technological advancements. The subreddit covers a broad range of topics, including emerging technologies such as AI, quantum computing, cybersecurity, 5G, and blockchain. It is widely recognized as a platform where users discuss technology trends, breakthroughs, and innovations that shape industries and everyday life.\
+[r/gadgets](https://www.reddit.com/r/gadgets/) s a subreddit focused on the latest consumer electronics, devices, and gadgets. With a highly engaged community, r/gadgets centers on product reviews, recommendations, and discussions about the functionality, usability, and innovations in consumer technology. From smartphones and smartwatches to gaming consoles and wearables, this subreddit is a go-to place for tech-savvy consumers to explore and discuss the latest gadgets on the market.
 
-### Description
+## Data Collection
 
-In week five we've learned about a few different classifiers. In week six we'll learn about webscraping, APIs, and Natural Language Processing (NLP). This project will put those skills to the test.
+he data for this project was sourced directly from Reddit using the Reddit API. We scraped post submissions from the r/technology and r/gadgets subreddits with a custom script that accessed the API. This approach ensured the collection of current and relevant discussions from these communities, allowing us to analyze trends in technology and gadgets.
 
-For project 3, your goal is two-fold:
-1. Using Reddit's API, you'll collect posts from two subreddits of your choosing.
-2. You'll then use various NLP techniques to process your data before training a range of classifiers to determine where a given post came from.
+### Size
+- **Samples**: 8,306
+- **Features**: 6
 
-
-#### About the API
-
-In 2023, Reddit proposed and underwent a series of changes to its API that greatly affected the ways that users, developers, and academics interact with and access the troves of data that its community freely creates.
-
-While the cost of data storage cannot be ignored, the monetization of its API has led to a shutdown of massively popular third-party and stifled [important research](https://arxiv.org/search/?query=reddit&searchtype=all&source=header) in the social sciences (community formation/network analysis, hate speech, discourse analysis, etc.), cybersecurity (bot detection), and—importantly for us this week—the very large and diverse world of natural language processing (semantic analysis, translation, topic modeling, disambiguation, relationship extraction, etc).
-
-While APIs like Pushshift that collected and stored Reddit's data from its inception are no longer accessible, we can still retrieve a limited amount of data directly from [Reddit's API](https://www.reddit.com/dev/api/). As with anytime you begin interacting with a new tool, you should familiarize yourself as much as possible with the documentation.
-
-**We will do a walkthrough of how to access and submit a simple request to the Reddit API together.**
-
----
-## Checkpoints and Advice
-
-If you aren't familiar with [reddit](https://www.reddit.com/), go check it out and browse different subreddits. Each subreddit is like a forum on a different topic. [Here's a list of subreddits by topic.](https://www.reddit.com/r/ListOfSubreddits/wiki/listofsubreddits)
-
-Data Choices
-- In your project you can classify posts, comments, titles, or some combination of those things. What you choose will partly determine how difficult your data cleaning will be and how challenging the classification task will be for your algorithms. In your presentation and executive summary, **tell us what you used**.
-- You can also include other information from posts or comments as features, but you must include some text.
-
-Subreddit Selection
-- The more similar the subreddits are, the more challenging (and interesting?!) your project will become.
-- Choose your subreddits as soon as you can and let us know your choices.  Consider the breakdown of the post count for each as well.
-
-Data collection
-- You should have a script written to retrieve data from your subreddits of choice as soon as possible. Because the API only allows us to retrieve 1000 of the most recent new and popular posts at time, this script should be written so that you can execute it from the command line at regular intervals.
-- The more data you can pull the better for your classifier. **Ideally you will want data from at least 3000 unique, non-null posts from each subreddit.**
+### Target
+- **Type**: Classification
+- **Target Variable**: subreddit
+- The goal is to predict the subreddit by analyzing the text. We will use Reddit posts scraped from the r/technology and r/gadgets subreddits. The data will include:
+### Data Dictionary
+The data used for this project is posts from r/technology and r/gadgets, obtained using the Reddit API.
+* [reddit_posts_comments.csv](./data/reddit_posts_comments1.csv): Contains all of the data for our model.
 
 
----
 
-### Requirements
+| Feature          | Type     | Dataset             | Description                                                                                   |
+|------------------|----------|---------------------|-----------------------------------------------------------------------------------------------|
+|post_id              | object    | reddit_posts| A unique identifier for each Reddit post.                                                                           |
+| title            | object    | reddit_posts|The title of the Reddit post.
+| content     | object    | reddit_posts| The body text or main content of the Reddit post.|
+| created_utc       | float  |reddit_posts|The timestamp of when the post was created in UTC.
+| subreddit    | object  | reddit_posts|The specific subreddit (e.g., r/technology or r/gadgets) where the post was made.|
+|comments       | object    | reddit_posts| The list of user comments associated with the Reddit post.      
 
-- Gather and prepare your data using the `requests` library in a Python script.
-- Script suggestions:
-    - First time it runs:
-        - Gets user input on subreddits they want to collect information from
-        - Asks user for their API credentials
-        - Stores this information in a JSON file
-    - Submits requests to API until maximum number of posts have been retrieved
-    - Writes/appends post data to a singular file
-    - Creates and updates a transaction log recording the number of posts retrieved per script execution, the datetime of its execution, and the total number of posts retrieved to date
-        - This would ensure that the script was executed over several days' time
-    - Other considerations
-        - Added functionality to drop data you are confident you will not want for EDA or modeling
-        - Added functionality to drop duplicate posts from each successful round of API requests
-        - *Advanced bonus*: schedule a process for the script to be run automatically at regular intervals to avoid having to do it manually
-- **Create and compare at least two models**. These can be any classifier of your choosing: logistic regression, Naive Bayes, KNN, Random Forest Classifier, etc.
-  - **Bonus**: use a Naive Bayes classifier
-- Try to **build a robust commit history** on GHE for this project.
-- A Jupyter Notebook with your analysis for a **peer audience of data scientists.**
-- An executive summary of your results.
-- A short presentation outlining your process and findings for a semi-technical audience, shoot for **8 minutes**.
+### Exploratory Data Analysis (EDA)
+Below are some visual insights gathered during the Exploratory Data Analysis phase:
 
-**Pro Tip:** You can find a good example executive summary [here](https://www.proposify.biz/blog/executive-summary).
+![Distribution of Posts by Subreddit](./img/Distribution_of_Posts.png)  
+*Figure 1: Distribution of Posts by Subreddit.*
 
----
+![Top_ten_words_in_Subreddits Titles](./img/Top_ten_words_in_subreddits.png)  
+*Figure 2: Top ten words in Titles of Subreddits.*
 
-### Necessary Deliverables / Submission
+These plots shows top ten words in the titles of technology and gadgets subreddits, as well as the overall distribution of the posts in the subreddits.
 
-- Code and executive summary must be in a clearly commented Jupyter Notebook.
-- You must submit your slide deck.
-- Deadlines:
-    - **Materials submitted**: 12 noon ET/ 9 AM PT, Friday, October 11th
-    - **Presentation**: 12:30 PM ET/ 930 AM PT, Friday, October 11th
-
----
-
-## Rubric
-You should make sure that you consider and/or follow most if not all of the considerations/recommendations outlined below **while** working through your project.
-
-For Project 3 the evaluation categories are as follows:<br>
-**The Data Science Process**
-- Problem Statement
-- Data Collection
-- Data Cleaning & EDA
-- Preprocessing & Modeling
-- Evaluation and Conceptual Understanding
-- Conclusion and Recommendations
-
-**Organization and Professionalism**
-- Organization
-- Visualizations
-- Python Syntax and Control Flow
-- Presentation
-
-**Scores will be out of 30 points based on the 10 categories in the rubric.** <br>
-*3 points per section*<br>
-
-| Score | Interpretation |
-| --- | --- |
-| **0** | *Project fails to meet the minimum requirements for this item.* |
-| **1** | *Project meets the minimum requirements for this item, but falls significantly short of portfolio-ready expectations.* |
-| **2** | *Project exceeds the minimum requirements for this item, but falls short of portfolio-ready expectations.* |
-| **3** | *Project meets or exceeds portfolio-ready expectations; demonstrates a thorough understanding of every outlined consideration.* |
+# Model Performance and Evaluation
+We tested several classification models to analyze and classify text data from subreddits such as r/technology and r/gadgets. Using data from these subreddits, we classified posts into the categories "Technology" and "Gadgets". The goal was to compare the performance of each model using key metrics, including accuracy, specificity, recall, and F1-scores.
+The models evaluated are:
+1. Logistic Regression with Count Vectorizer
+2. K-Nearest Neighbors (KNN) with TF-IDF Vectorizer
+3. Naive Bayes with Count Vectorizer
 
 
-### The Data Science Process
+### Summary of Model Performance
 
-**Problem Statement**
-- Is it clear what the goal of the project is?
-- What type of model will be developed?
-- How will success be evaluated?
-- Is the scope of the project appropriate?
-- Is it clear who cares about this or why this is important to investigate?
-- Does the student consider the audience and the primary and secondary stakeholders?
-
-**Data Collection**
-- Was enough data gathered to generate a significant result?
-- Was data collected that was useful and relevant to the project?
-- Was data collection and storage optimized through custom functions, pipelines, and/or automation?
-- Was thought given to the server receiving the requests such as considering number of requests per second?
-
-**Data Cleaning and EDA**
-- Are missing values imputed/handled appropriately?
-- Are distributions examined and described?
-- Are outliers identified and addressed?
-- Are appropriate summary statistics provided?
-- Are steps taken during data cleaning and EDA framed appropriately?
-- Does the student address whether or not they are likely to be able to answer their problem statement with the provided data given what they've discovered during EDA?
-
-**Preprocessing and Modeling**
-- Is text data successfully converted to a matrix representation?
-- Are methods such as stop words, stemming, and lemmatization explored?
-- Does the student properly split and/or sample the data for validation/training purposes?
-- Does the student test and evaluate a variety of models to identify a production algorithm (**AT MINIMUM:** two classification models, **BONUS:** try a Naive Bayes)?
-- Does the student defend their choice of production model relevant to the data at hand and the problem?
-- Does the student explain how the model works and evaluate its performance successes/downfalls?
-
-**Evaluation and Conceptual Understanding**
-- Does the student accurately identify and explain the baseline score?
-- Does the student select and use metrics relevant to the problem objective?
-- Does the student interpret the results of their model for purposes of inference?
-- Is domain knowledge demonstrated when interpreting results?
-- Does the student provide appropriate interpretation with regards to descriptive and inferential statistics?
-
-**Conclusion and Recommendations**
-- Does the student provide appropriate context to connect individual steps back to the overall project?
-- Is it clear how the final recommendations were reached?
-- Are the conclusions/recommendations clearly stated?
-- Does the conclusion answer the original problem statement?
-- Does the student address how findings of this research can be applied for the benefit of stakeholders?
-- Are future steps to move the project forward identified?
+| **Model**                             | **Training Accuracy** | **Test Accuracy** | **Training Misclassification Rate** | **Test Misclassification Rate** | **Specificity** | **Recall** | **F1-score Technology** | **F1-score Gadgets** |                                                            |
+|---------------------------------------|-----------------------|-------------------|-------------------------------------|----------------------------------|-----------------|------------|-------------------------|----------------------|-------------------------------------------------------------------------|
+| **Logistic Regression with Count Vectorizer** | 1.00                  | 0.84              | 0.00                              | 0.16                             | 0.75            | 0.89       | 0.87                    | 0.78                 |                |
+| **KNN with TF-IDF Vectorizer**        | 0.88                  | 0.84              | 0.09                                | 0.16                             | 0.83           | 0.85       | 0.87                    | 0.80                 |  |
+| **Naive Bayes with TF_IDF Vectorizer** | 0.90                  | 0.85              | 0.10                                | 0.15                             | 0.77            | 0.91       | 0.88                    | 0.80                 |                               |
+             |
 
 
-### Organization and Professionalism
-
-**Project Organization**
-- Are modules imported correctly (using appropriate aliases)?
-- Are data imported/saved using relative paths?
-- Does the README provide a good executive summary of the project?
-- Is markdown formatting used appropriately to structure notebooks?
-- Are there an appropriate amount of comments to support the code?
-- Are files & directories organized correctly?
-- Are there unnecessary files included?
-- Do files and directories have well-structured, appropriate, consistent names?
-- Is there a robust commit history?
-
-**Visualizations**
-- Are sufficient visualizations provided?
-- Do plots accurately demonstrate valid relationships?
-- Are plots labeled properly?
-- Are plots interpreted appropriately?
-- Are plots formatted and scaled appropriately for inclusion in a notebook-based technical report?
-
-**Python Syntax and Control Flow**
-- Is care taken to write human readable code?
-- Is the code syntactically correct (no runtime errors)?
-- Does the code generate desired results (logically correct)?
-- Does the code follows general best practices and style guidelines?
-- Are Pandas functions used appropriately?
-- Are `sklearn` and `NLTK` methods used appropriately?
-
-**Presentation**
-- Is the problem statement clearly presented?
-- Does a strong narrative run through the presentation building toward a final conclusion?
-- Are the conclusions/recommendations clearly stated?
-- Is the level of technicality appropriate for the intended audience?
-- Is the student substantially over or under time?
-- Does the student appropriately pace their presentation?
-- Does the student deliver their message with clarity and volume?
-- Are appropriate visualizations generated for the intended audience?
-- Are visualizations necessary and useful for supporting conclusions/explaining findings?
 
 
----
+The **Naive Bayes with Count Vectorizer** model proved to be the optimal model for classifying text data in the r/technology and r/gadgets subreddits. It offers an excellent balance of precision, recall, and generalizability without overfitting. While other models like Logistic Regression with Count Vectorizer also performed well, Naive Bayes with TF-IDF is more versatile and effective for this task.
 
-### Why did we choose this project for you?
-This project covers three of the biggest concepts we cover in the class: Classification Modeling, Natural Language Processing and Data Wrangling/Acquisition.
+## Conclusion
+The machine learning models developed in this project successfully classify Reddit posts from the technology and gadgets subreddits into two key categories: "technology" and "gadgets." This classification enables the global technology company to gain actionable insights into how online communities discuss technology innovations and gadgets. By leveraging these insights, the company can guide product development and marketing strategies to stay ahead in the competitive consumer electronics market.
 
-Part 1 of the project focuses on **Data wrangling/gathering/acquisition**. This is a very important skill as not all the data you will need will be in clean CSVs or a single table in SQL.  There is a good chance that wherever you land you will have to gather some data from some unstructured/semi-structured sources; when possible, requesting information from an API, but often scraping it because they don't have an API (or it's terribly documented).
+After evaluating several models, Naive Bayes with Count Vectorizer emerged as the most balanced and effective model. It demonstrated strong performance across critical metrics, offering the best combination of accuracy and scalability.
 
-Part 2 of the project focuses on **Natural Language Processing** and converting standard text data (like Titles and Comments) into a format that allows us to analyze it and use it in modeling.
-
-Part 3 of the project focuses on **Classification Modeling**.  Given that project 2 was a regression focused problem, we needed to give you a classification focused problem to practice the various models, means of assessment and preprocessing associated with classification.   
+## Key Takeaways
+- **Accurate Classification of Posts**
+The model achieved a high level of accuracy in distinguishing between posts from the technology and gadgets categories. This enables the automated analysis of large volumes of text data, facilitating a more efficient understanding of community discussions in different tech sectors.
+- **Identification of Emerging Trends**
+The analysis revealed that AI (Artificial Intelligence) is the most frequently discussed topic in the technology category, followed by significant trends such as IoT (Internet of Things), electric vehicles, and quantum computing.
+In the gadgets category, the top discussions revolved around smartphones, laptops, and headphones, highlighting key areas of consumer interest in electronics.
+ - **Scalability and Real-World Application**
+The machine learning model is scalable and can be applied to other subreddits or online platforms to continuously track and analyze technology trends. Additionally, the classification framework is adaptable to a variety of domains, making it useful beyond just technology-related discussions.ns.
+## Next Steps
+- **Exploring more advanced models:** Consider implementing models like Random Forests, Support Vector Machines (SVM), or deep learning techniques to further enhance accuracy and prediction capabilities.
+- **Continuously updating the model:** Regularly update the model with new data to ensure it reflects the latest trends in technology and consumer gadgets, maintaining relevance as discussions evolve.
