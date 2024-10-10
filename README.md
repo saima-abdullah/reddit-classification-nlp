@@ -55,12 +55,12 @@ The models evaluated are:
 
 ### Summary of Model Performance
 
-| **Model**                             | **Training Accuracy** | **Test Accuracy** | **Training Misclassification Rate** | **Test Misclassification Rate** | **Specificity** | **Recall** | **F1-score Technology** | **F1-score Gadgets** |                                                            |
-|---------------------------------------|-----------------------|-------------------|-------------------------------------|----------------------------------|-----------------|------------|-------------------------|----------------------|-------------------------------------------------------------------------|
-| **Logistic Regression with Count Vectorizer** | 1.00                  | 0.84              | 0.00                              | 0.16                             | 0.75            | 0.89       | 0.87                    | 0.78                 |                |
-| **KNN with TF-IDF Vectorizer**        | 0.88                  | 0.84              | 0.09                                | 0.16                             | 0.83           | 0.85       | 0.87                    | 0.80                 |  |
-| **Naive Bayes with TF_IDF Vectorizer** | 0.90                  | 0.85              | 0.10                                | 0.15                             | 0.77            | 0.91       | 0.88                    | 0.80                 |                               |
-             |
+   | **Model** | **Training Accuracy** | **Test Accuracy** | **Training Misclassification Rate** | **Test Misclassification Rate** | **Specificity** | **Recall** | **F1-score Technology** | **F1-score Gadgets** |
+|-----------|-----------------------|-------------------|-------------------------------------|----------------------------------|-----------------|------------|-------------------------|----------------------|
+| **Logistic Regression with Count Vectorizer** | 1.00 | 0.84 | 0.00 | 0.16 | 0.75 | 0.89 | 0.87 | 0.78 |
+| **KNN with TF-IDF Vectorizer** | 0.88 | 0.84 | 0.12 | 0.16 | 0.83 | 0.85 | 0.87 | 0.80 |
+| **Naive Bayes with TF-IDF Vectorizer** | 0.90 | 0.85 | 0.10 | 0.15 | 0.77 | 0.91 | 0.88 | 0.80 |
+
 
 
 
